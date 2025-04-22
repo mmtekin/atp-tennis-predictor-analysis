@@ -6,7 +6,7 @@ An analysis of ATP tennis matches to predict match outcomes and explore patterns
 
 ## Introduction
 
-This project analyzes historical ATP tennis match data (after transformation, 6152 rows since every row from original dataset had to be split into 2 rows) to uncover patterns in professional tennis and build a pre‑match predictor of match outcomes. We explore how variables like player ranking, age, and Elo rating affect winning probability, then train a model that—using only these pre‑match stats—forecasts which player will win. Such insights can aid coaches, bettors, and tennis analysts in understanding match dynamics before a ball is struck.
+This project analyzes historical ATP tennis match data (after transformation, 6152 rows since every row from original dataset had to be split into 2 rows) to uncover patterns in professional tennis and build a pre‑match predictor of match outcomes. I explore how variables like player ranking, age, and Elo rating affect winning probability, then train a model that—using only these pre‑match stats—forecasts which player will win. Such insights can aid coaches, bettors, and tennis analysts in understanding match dynamics before a ball is struck.
 
 ## Data Cleaning and Exploratory Data Analysis
 
@@ -129,7 +129,7 @@ This strong correlation makes ranking difference a potentially powerful predicto
 
 ### Interesting Aggregates
 
-We analyzed how player ranking tiers interact with court surfaces to influence win rates:
+I analyzed how player ranking tiers interact with court surfaces to influence win rates:
 
 <iframe
 src="assets/winRateBySurfaceAndRankTier.html"
@@ -177,15 +177,184 @@ The transformation process ensured that our final dataset contains no missing va
 
 ## Framing a Prediction Problem
 
-[Your prediction problem description will go here]
+I have formulated our analysis as a **binary classification problem** to predict tennis match outcomes. This framing aligns naturally with the binary nature of tennis matches (win/loss) and builds upon the insights gained from our exploratory analysis.
+
+### Prediction Task
+- **Target Variable**: `did_p1_win` (1 if Player 1 wins, 0 if Player 1 loses)
+- **Type**: Binary Classification
+- **Goal**: Predict match winner before the match begins
+
+### Feature Selection
+I carefully selected features that would be known before a match starts, ensuring my model could make real-world predictions:
+
+1. **Player Rankings**
+   - Player 1 and 2 ATP rankings (`p1_rank`, `p2_rank`)
+   - Ranking points (`p1_rank_points`, `p2_rank_points`)
+   - Our earlier analysis showed ranking difference is highly predictive of match outcomes
+
+2. **Player Characteristics**
+   - Ages (`p1_age`, `p2_age`)
+   - Dominant hands (`p1_hand`, `p2_hand`)
+   - Age analysis showed younger players often have an advantage
+
+3. **Match Context**
+   - Court surface (`surface`)
+   - Our aggregate analysis showed surface affects win rates across ranking tiers
+
+### Evaluation Metric
+I chose **accuracy** as my primary evaluation metric for several reasons:
+1. My dataset is perfectly balanced due to my transformation approach (each match appears twice with players swapped)
+2. False positives and false negatives are equally important in match prediction
+3. Accuracy provides a straightforward interpretation: the proportion of matches I predict correctly
+
+This framing allows me to build upon my exploratory insights, particularly the strong relationship between ranking differences and match outcomes, while maintaining practical applicability for real-world match prediction.
 
 ## Baseline Model
 
-[Your baseline model description and results will go here]
+For my initial prediction approach, I implemented a simple decision tree classifier (with max_depth=3) as a baseline model. This choice provides an interpretable starting point while incorporating both ranking and player characteristics.
+
+### Model Architecture
+- **Model Type**: Decision Tree (depth-3)
+- **Implementation**: Single sklearn Pipeline combining preprocessing and classification
+- **Training/Test Split**: 80/20 split with stratification on the target variable
+
+### Features
+The baseline model uses four features:
+1. **Quantitative Features (2)**
+   - Player 1 ATP Ranking (`p1_rank`)
+   - Player 2 ATP Ranking (`p2_rank`)
+
+2. **Nominal Features (2)**
+   - Player 1 Handedness (`p1_hand`)
+   - Player 2 Handedness (`p2_hand`)
+
+### Preprocessing Pipeline
+All preprocessing steps are encapsulated in a single sklearn Pipeline:
+1. **For Quantitative Features**:
+   - Missing values imputed using median strategy
+   - Features standardized to zero mean and unit variance
+
+2. **For Nominal Features**:
+   - One-hot encoding applied to handedness
+   - Unknown categories handled gracefully with 'ignore' strategy
+
+### Performance
+- **Test Set Accuracy**: 0.5857 (58.57%)
+- **Baseline Comparison**: Performs only 8.57 percentage points better than random guessing (50%)
+
+### Evaluation
+This baseline model's performance is relatively weak, suggesting significant room for improvement. The modest improvement over random guessing (only 8.57 percentage points) indicates that:
+1. The selected features, particularly player handedness, may not be strong predictors of match outcomes
+2. The simple decision tree structure may be insufficient to capture complex patterns in tennis match outcomes
+3. Important predictive features from our exploratory analysis (like age and surface) are not yet incorporated
+
+This baseline provides a clear starting point for improvement in our final model, where I can incorporate additional features identified in our exploratory analysis and potentially use more sophisticated modeling techniques.
 
 ## Final Model
 
-[Your final model description, improvements, and results will go here]
+To improve upon the baseline model's performance, I developed a more sophisticated approach using gradient boosting and carefully engineered features that capture the complex dynamics of tennis matches.
+
+### Feature Engineering
+
+I engineered several new features that capture different aspects of match dynamics:
+
+1. **Player Differentials**
+   - **Rank Difference** (`rank_diff`): Captures skill gap between players
+   - **Age Difference** (`age_diff`): Reflects physical and experience disparities
+   - **Ranking Points Difference** (`points_diff`): More granular measure of recent performance
+   - **Elo Difference** (`elo_diff`): Dynamic rating system that updates after every match
+
+2. **Tournament Context**
+   - **Round Ordinal** (`round_ord`): Encoded match stages (R128→1 to F→7)
+   - **Tournament Level** (`tourney_level_ord`): Encoded tournament prestige (Grand Slam→5 to Tour→0)
+   - **Seasonal Features** (`month_sin`, `month_cos`): Cyclical encoding of tournament month
+
+3. **Playing Conditions**
+   - **Surface**: One-hot encoded court types (Hard, Clay, Grass)
+   - **Player Handedness**: Encoded left/right-handed matchup dynamics
+
+### Feature Preprocessing Pipeline
+
+The model employs a sophisticated preprocessing pipeline with different strategies for each feature type:
+
+1. **Numeric Features** (rankings, differences):
+   - Missing value imputation
+   - Standard scaling (zero mean, unit variance)
+
+2. **Quantile Features** (points difference):
+   - Missing value imputation
+   - Quantile transformation to normal distribution
+
+3. **Ordinal Features** (round, level, seasonal):
+   - Passed through as already properly encoded
+
+4. **Categorical Features** (surface, handedness):
+   - One-hot encoding with unknown category handling
+
+### Model Selection and Training
+
+I chose the **Histogram-based Gradient Boosting Classifier** for several reasons:
+1. Efficient handling of mixed data types
+2. Ability to capture non-linear feature interactions
+3. Built-in handling of missing values
+4. Strong performance on tabular data
+
+### Hyperparameter Tuning
+
+Used 5-fold cross-validation with GridSearchCV to optimize:
+- **Number of iterations**: Controls model complexity
+- **Tree depth**: Balances detail vs. generalization
+- **Learning rate**: Affects convergence speed
+- **L2 regularization**: Controls overfitting
+
+Best parameters found:
+```python
+{
+    'max_iter': 100,
+    'max_depth': 10,
+    'learning_rate': 0.01,
+    'l2_regularization': 0
+}
+```
+
+### Performance Improvement
+
+The final model achieved significant improvements over the baseline:
+- **Baseline Model**: 58.57% accuracy
+- **Final Model**: 63.70% accuracy
+- **Improvement**: 5.13 percentage points
+
+This improvement suggests that our engineered features successfully capture important match dynamics that the baseline model missed.
+
+### Performance Visualization
+
+<iframe
+src="assets/confusion_matrix.html"
+width="800"
+height="600"
+frameborder="0"
+></iframe>
+
+The confusion matrix shows balanced performance across both positive and negative predictions, indicating the model isn't biased toward either outcome.
+
+### Feature Impact Analysis
+
+The most influential features in predicting match outcomes were:
+1. Ranking difference (capturing skill gap)
+2. Elo difference (recent performance)
+3. Tournament level (match importance)
+4. Surface (playing conditions)
+
+This aligns with tennis expertise, where ranking and recent form are typically the strongest predictors of match outcomes.
+
+### Model Limitations
+
+While the model shows good improvement, some limitations remain:
+1. Doesn't capture player-specific surface preferences
+2. Cannot account for injuries or fatigue
+3. May not fully capture momentum from recent tournament performance
+
+These limitations suggest potential areas for future model improvements, such as incorporating player-surface win rates or recent match history features.
 
 ---
 *This project was created as part of EECS 398: Practical Data Science at the University of Michigan.*
