@@ -1,6 +1,6 @@
 # ATP Tennis Match Prediction Analysis
 
-By Malik Tekin (mtekin@umich.edu)
+By M. Malik Tekin (mmtekin@umich.edu)
 
 An analysis of ATP tennis matches to predict match outcomes and explore patterns in professional tennis. This project applies practical data science techniques to understand and predict tennis match results using historical ATP tour data.
 
@@ -12,18 +12,19 @@ This project analyzes historical ATP tennis match data (after transformation, 61
 
 ### Data Cleaning Process
 
-The data cleaning process involved several sophisticated transformations to prepare the ATP match data for analysis:
+My data cleaning process involved several sophisticated transformations to prepare the ATP match data for analysis:
 
 1. **Elo Rating Computation**
    - Implemented a dynamic Elo rating system for all players
    - Processed matches chronologically to maintain accurate rating progression
-   - Initial rating of 1500 for new players
-   - Ratings update after each match using standard Elo formula with k=32
+   - Initial rating set to 1500, following the standard Elo convention where 1500 represents an average skill level
+   - Ratings updated after each match using the standard Elo formula: R_new = R_old + K * (Actual - Expected)
+   - Used K-factor of 32 to balance rating responsiveness with stability
 
 2. **Data Restructuring**
    - Transformed the original match-centric format to a player-centric format
    - Each match was split into two rows to represent both perspectives (winner and loser)
-   - This doubled our dataset size but provides balanced training data for our prediction model
+   - This doubled my dataset size but provides balanced training data for my prediction model
 
 3. **Feature Engineering**
    - Converted tournament dates to datetime format
@@ -38,11 +39,11 @@ Key features in transformed dataset:
    - Player 2 stats: rank, age, hand, rank_points, elo
    - Outcome: did_p1_win (binary)
 
-This transformation approach ensures our model can learn from both winning and losing perspectives, while maintaining the temporal nature of the Elo rating system.
+This transformation approach ensures my model can learn from both winning and losing perspectives, while maintaining the temporal nature of the Elo rating system.
 
 ### Univariate Analysis
 
-Our univariate analysis revealed several interesting distributions in our tennis match dataset:
+My univariate analysis revealed several interesting distributions in the tennis match dataset:
 
 1. **Player Rankings Distribution**
 <iframe
@@ -52,7 +53,7 @@ height="600"
 frameborder="0"
 ></iframe>
 
-The distribution of player rankings shows a significant skew towards higher-ranked players (ranks 1-49), with 2,778 matches compared to 1,831 matches for players ranked 50-99. This makes sense as our dataset focuses on major tournaments rather than challenger events.
+The distribution of player rankings shows a significant skew towards higher-ranked players (ranks 1-49), with 2,778 matches compared to 1,831 matches for players ranked 50-99. This makes sense as my dataset focuses on major tournaments rather than challenger events. This is just good to know for understanding the dataset.
 
 2. **Age Distribution**
 <iframe
@@ -62,7 +63,7 @@ height="600"
 frameborder="0"
 ></iframe>
 
-The age distribution reveals that most players are between 25-29 years old, with a steep drop-off after age 29. This suggests that players' physical prime typically lasts until around age 29.
+The age distribution reveals that most players are between 25-29 years old, with a steep drop-off after age 29. This suggests that players' physical prime typically lasts until around age 29. This makes it even more impressive that someone like Novak Djokovic is still playing at the highest level at age 37. 
 
 3. **Court Surface Distribution**
 <iframe
@@ -72,7 +73,7 @@ height="600"
 frameborder="0"
 ></iframe>
 
-Hard courts dominate the dataset, followed by clay, with grass courts having the fewest matches. This distribution will be important when evaluating our model's performance across different surfaces.
+Hard courts dominate the dataset, followed by clay, with grass courts having the fewest matches. This distribution will be important when evaluating my model's performance across different surfaces. This could also mean that the model is biased towards hard courts, which is something to keep in mind.
 
 4. **Player Handedness**
 <iframe
@@ -82,11 +83,11 @@ height="600"
 frameborder="0"
 ></iframe>
 
-The vast majority of players are right-handed, which aligns with general population statistics. This distribution is particularly interesting given the traditional belief about left-handed players having an advantage.
+The vast majority of players are right-handed, which aligns with general population statistics (roughly 90% of the population is right-handed and this gave 86%). 
 
 ### Bivariate Analysis
 
-Our bivariate analysis focused on understanding how different factors relate to match outcomes:
+My bivariate analysis focused on understanding how different factors relate to match outcomes:
 
 1. **Age Difference and Win Rate**
 <iframe
@@ -97,9 +98,9 @@ frameborder="0"
 ></iframe>
 
 This analysis reveals that:
-- Players tend to have higher win rates when they are 2-8 years younger than their opponents
+- Players tend to have higher win rates when they are 2-8 years younger than their opponents.
 - A sharp increase in win rate occurs with >10 years age difference
-- Being older (especially by >4 years) correlates with lower win rates
+- Being older (especially by >4 years) correlates with significantly lower win rates
 - The most significant drop in win rate occurs when a player is >12 years older
 
 2. **Handedness and Win Rate**
@@ -110,7 +111,7 @@ height="600"
 frameborder="0"
 ></iframe>
 
-Surprisingly, our analysis shows no significant advantage for left-handed players, contrary to common tennis wisdom. This suggests that handedness might not be a crucial feature for match prediction.
+Surprisingly, my analysis shows no significant advantage for left-handed players, contrary to common tennis wisdom. This suggests that handedness might not be a crucial feature for match prediction. This does go against the common belief that left-handed players have an advantage over right-handed players due to them being able to hit forehands to their opponents' backhands. This plot seems to suggest that there is no advantage to being left-handed which is important to note. 
 
 3. **Ranking Difference and Win Rate**
 <iframe
@@ -121,11 +122,11 @@ frameborder="0"
 ></iframe>
 
 The relationship between ranking difference and win probability is strong and clear:
-- Players with better rankings (negative rank difference) win approximately 75% of matches
-- Equal rankings (~0 difference) correspond to ~50% win rates
-- Lower-ranked players (positive rank difference) win less than 25% of matches against opponents ranked 90+ spots higher
+- Players with better rankings (negative rank difference) win approximately significantly more matches than players with worse rankings (positive rank difference)
+- Equal rankings (~0 difference) correspond to ~50% win rates which makes sense as this means they are evenly matched
+- Lower-ranked players (positive rank difference) win less than 25% of matches against opponents ranked 90+ spots higher which means an upset is highly unlikely if the rankings are significantly different (70+).
 
-This strong correlation makes ranking difference a potentially powerful predictor for our model.
+This strong correlation makes ranking difference a potentially powerful predictor for my model.
 
 ### Interesting Aggregates
 
@@ -143,21 +144,22 @@ This pivot table reveals several fascinating patterns about the relationship bet
 1. **Top 10 Players' Dominance**:
    - Elite players (Top 10) maintain impressive win rates >70% across all surfaces
    - Highest win rates on grass (77%) and clay (76%)
-   - Relatively lower win rate on hard courts (71%), suggesting surface might be a slight equalizer
+   - Relatively lower win rate on hard courts (71%), suggesting surface might be a slight equalizer.
+   - Possible reason for that is that most players play on hard courts and are therefore more familiar with the surface.
 
 2. **Mid-Tier Performance (11-50)**:
    - Players ranked 11-25 show consistent performance (~60% win rate) across surfaces
-   - Rankings 26-50 maintain win rates around 48-51%, with grass courts showing slightly better outcomes
+   - Rankings 26-50 maintain win rates around 48-51%, with grass courts showing slightly better outcomes but not significantly so.
 
 3. **Lower Rankings Impact**:
    - Players ranked 100+ struggle significantly with ~40% win rates across all surfaces
-   - The skill gap is most pronounced on clay courts, where ranking appears to be particularly important
+   - The win rate is evenly distributed across all surfaces which means that the surface is not a significant factor for lower ranked players as compared to the top players (grass being higher for top players)
 
-This analysis suggests that while top players maintain their advantage across all surfaces, the impact of ranking on win probability varies by surface type. Hard courts, being the most common surface, show slightly more competitive matches across ranking tiers, possibly due to players' greater familiarity with the surface.
+This analysis suggests that while top players maintain their advantage across all surfaces, the impact of ranking on win probability varies very little by surface type. Hard courts, being the most common surface, show slightly more competitive matches across ranking tiers, possibly due to players' greater familiarity with the surface. 
 
 ### Handling Missing Values
 
-Our data cleaning process was designed to minimize the impact of missing values:
+My data cleaning process was designed to minimize the impact of missing values:
 
 1. **Elo Ratings**
    - New players automatically assigned 1500
@@ -166,48 +168,62 @@ Our data cleaning process was designed to minimize the impact of missing values:
 
 2. **Player Attributes**
    - Rank and rank points: Used as-is (missing values indicate unranked players)
-   - Age and hand: Complete in our dataset
+   - Age distribution before and after imputation:
+
+<iframe
+src="assets/ageBeforeImputation.html"
+width="800"
+height="400"
+frameborder="0"
+></iframe>
+
+<iframe
+src="assets/ageAfterImputation.html"
+width="800"
+height="400"
+frameborder="0"
+></iframe>
+
+As shown in the distributions above, age imputation had minimal impact on my dataset since the vast majority of players had their ages recorded. The distributions before and after imputation are nearly identical, confirming that missing age values were not a significant concern for my analysis.
+
+   - Hand: Complete in my dataset
    - Surface: No missing values in selected tournaments
 
 3. **Tournament Information**
    - All selected fields (date, surface, level, round) are complete
    - Draw size is consistently recorded
 
-The transformation process ensured that our final dataset contains no missing values that would impact our prediction task.
+The transformation process ensured that the final dataset contains no missing values that would impact the prediction task.
 
 ## Framing a Prediction Problem
 
-I have formulated our analysis as a **binary classification problem** to predict tennis match outcomes. This framing aligns naturally with the binary nature of tennis matches (win/loss) and builds upon the insights gained from our exploratory analysis.
+I have formulated my analysis as a **binary classification problem** to predict tennis match outcomes. 
 
-### Prediction Task
-- **Target Variable**: `did_p1_win` (1 if Player 1 wins, 0 if Player 1 loses)
-- **Type**: Binary Classification
-- **Goal**: Predict match winner before the match begins
-
-### Feature Selection
-I carefully selected features that would be known before a match starts, ensuring my model could make real-world predictions:
-
-1. **Player Rankings**
-   - Player 1 and 2 ATP rankings (`p1_rank`, `p2_rank`)
-   - Ranking points (`p1_rank_points`, `p2_rank_points`)
-   - Our earlier analysis showed ranking difference is highly predictive of match outcomes
-
-2. **Player Characteristics**
-   - Ages (`p1_age`, `p2_age`)
-   - Dominant hands (`p1_hand`, `p2_hand`)
-   - Age analysis showed younger players often have an advantage
-
-3. **Match Context**
-   - Court surface (`surface`)
-   - Our aggregate analysis showed surface affects win rates across ranking tiers
+### Prediction Task Details
+- **Type**: Binary Classification (two possible outcomes: win or loss)
+- **Response Variable**: `did_p1_win` (1 if Player 1 wins, 0 if Player 1 loses)
+  - This variable was chosen because it directly represents the match outcome we want to predict
+  - The binary nature aligns with the fundamental win/loss structure of tennis matches
 
 ### Evaluation Metric
 I chose **accuracy** as my primary evaluation metric for several reasons:
-1. My dataset is perfectly balanced due to my transformation approach (each match appears twice with players swapped)
-2. False positives and false negatives are equally important in match prediction
-3. Accuracy provides a straightforward interpretation: the proportion of matches I predict correctly
+1. The dataset is perfectly balanced due to my transformation approach (each match appears twice with players swapped)
+2. False positives and false negatives are equally important in tennis match prediction
+3. Accuracy provides an intuitive interpretation for stakeholders: "What percentage of matches did we predict correctly?"
 
-This framing allows me to build upon my exploratory insights, particularly the strong relationship between ranking differences and match outcomes, while maintaining practical applicability for real-world match prediction.
+Alternative metrics like F1-score or AUC-ROC were considered but not chosen since:
+- The classes are balanced, so accuracy isn't biased
+- We care equally about both types of errors (false positives/negatives)
+- Stakeholders (coaches, analysts) prefer the straightforward interpretation of accuracy
+
+### Time of Prediction Considerations
+The model only uses information that would be known before a match starts:
+- Player rankings and points (published weekly)
+- Player characteristics (age, dominant hand)
+- Tournament context (surface, round, level)
+- Historical performance metrics (Elo ratings calculated from past matches)
+
+This ensures the model makes realistic predictions that could be used in practice, without relying on in-match statistics or post-match data.
 
 ## Baseline Model
 
@@ -260,14 +276,14 @@ I engineered several new features that capture different aspects of match dynami
 
 1. **Player Differentials**
    - **Rank Difference** (`rank_diff`): Captures skill gap between players
-   - **Age Difference** (`age_diff`): Reflects physical and experience disparities
-   - **Ranking Points Difference** (`points_diff`): More granular measure of recent performance
+   - **Age Difference** (`age_diff`): Reflects physical and experience disparities that are important as we saw in the exploratory data analysis
+   - **Ranking Points Difference** (`points_diff`): Another measure of recent performance
    - **Elo Difference** (`elo_diff`): Dynamic rating system that updates after every match
 
 2. **Tournament Context**
    - **Round Ordinal** (`round_ord`): Encoded match stages (R128→1 to F→7)
-   - **Tournament Level** (`tourney_level_ord`): Encoded tournament prestige (Grand Slam→5 to Tour→0)
-   - **Seasonal Features** (`month_sin`, `month_cos`): Cyclical encoding of tournament month
+   - **Tournament Level** (`tourney_level_ord`): Encoded tournament prestige (Grand Slam→5 to Tour→0) as nerves probably play a role in the performance of the players
+   - **Seasonal Features** (`month_sin`, `month_cos`): Cyclical encoding of tournament month to capture seasonal effects if any. This captures grass, clay, and hard court seasons.
 
 3. **Playing Conditions**
    - **Surface**: One-hot encoded court types (Hard, Clay, Grass)
@@ -296,8 +312,7 @@ The model employs a sophisticated preprocessing pipeline with different strategi
 I chose the **Histogram-based Gradient Boosting Classifier** for several reasons:
 1. Efficient handling of mixed data types
 2. Ability to capture non-linear feature interactions
-3. Built-in handling of missing values
-4. Strong performance on tabular data
+3. Strong performance on tabular data
 
 ### Hyperparameter Tuning
 
@@ -324,16 +339,11 @@ The final model achieved significant improvements over the baseline:
 - **Final Model**: 63.70% accuracy
 - **Improvement**: 5.13 percentage points
 
-This improvement suggests that our engineered features successfully capture important match dynamics that the baseline model missed.
+This improvement suggests that the engineered features successfully capture important match dynamics that the baseline model missed.
 
 ### Performance Visualization
 
-<iframe
-src="assets/confusion_matrix.html"
-width="800"
-height="600"
-frameborder="0"
-></iframe>
+![Confusion Matrix](assets/confusion_matrix.png)
 
 The confusion matrix shows balanced performance across both positive and negative predictions, indicating the model isn't biased toward either outcome.
 
@@ -349,8 +359,8 @@ This aligns with tennis expertise, where ranking and recent form are typically t
 
 ### Model Limitations
 
-While the model shows good improvement, some limitations remain:
-1. Doesn't capture player-specific surface preferences
+While my model shows good improvement, some limitations remain:
+1. Doesn't capture player-specific surface preferences such as Rafael Nadal's clay court dominance or Roger Federer's grass court ability
 2. Cannot account for injuries or fatigue
 3. May not fully capture momentum from recent tournament performance
 
