@@ -129,7 +129,31 @@ This strong correlation makes ranking difference a potentially powerful predicto
 
 ### Interesting Aggregates
 
-[Your grouped/pivot table will be embedded here]
+We analyzed how player ranking tiers interact with court surfaces to influence win rates:
+
+<iframe
+src="assets/winRateBySurfaceAndRankTier.html"
+width="800"
+height="400"
+frameborder="0"
+></iframe>
+
+This pivot table reveals several fascinating patterns about the relationship between player ranking and surface-specific performance:
+
+1. **Top 10 Players' Dominance**:
+   - Elite players (Top 10) maintain impressive win rates >70% across all surfaces
+   - Highest win rates on grass (77%) and clay (76%)
+   - Relatively lower win rate on hard courts (71%), suggesting surface might be a slight equalizer
+
+2. **Mid-Tier Performance (11-50)**:
+   - Players ranked 11-25 show consistent performance (~60% win rate) across surfaces
+   - Rankings 26-50 maintain win rates around 48-51%, with grass courts showing slightly better outcomes
+
+3. **Lower Rankings Impact**:
+   - Players ranked 100+ struggle significantly with ~40% win rates across all surfaces
+   - The skill gap is most pronounced on clay courts, where ranking appears to be particularly important
+
+This analysis suggests that while top players maintain their advantage across all surfaces, the impact of ranking on win probability varies by surface type. Hard courts, being the most common surface, show slightly more competitive matches across ranking tiers, possibly due to players' greater familiarity with the surface.
 
 ### Handling Missing Values
 
