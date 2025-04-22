@@ -1,4 +1,4 @@
-# ATP Tennis Match Prediction Analysis
+# ATP Tennis Match Predictor and Data Analysis
 
 By M. Malik Tekin (mmtekin@umich.edu)
 
